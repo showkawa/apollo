@@ -32,6 +32,7 @@ import com.ctrip.framework.apollo.util.http.HttpUtil;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.net.HttpHeaders;
 import com.google.common.net.UrlEscapers;
 import com.google.common.util.concurrent.SettableFuture;
 import com.google.gson.Gson;
@@ -41,6 +42,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletResponse;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -80,7 +82,6 @@ public class RemoteConfigRepositoryTest {
 
     when(pollResponse.getStatusCode()).thenReturn(HttpServletResponse.SC_NOT_MODIFIED);
 
-    MockInjector.reset();
     configUtil = new MockConfigUtil();
     MockInjector.setInstance(ConfigUtil.class, configUtil);
 
@@ -109,6 +110,11 @@ public class RemoteConfigRepositoryTest {
 
     someAppId = "someAppId";
     someCluster = "someCluster";
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    MockInjector.reset();
   }
 
   @Test
@@ -181,7 +187,7 @@ public class RemoteConfigRepositoryTest {
         Map<String, String> headers = request.getHeaders();
         assertNotNull(headers);
         assertTrue(headers.containsKey(Signature.HTTP_HEADER_TIMESTAMP));
-        assertTrue(headers.containsKey(Signature.HTTP_HEADER_AUTHORIZATION));
+        assertTrue(headers.containsKey(HttpHeaders.AUTHORIZATION));
 
         return someResponse;
       }
